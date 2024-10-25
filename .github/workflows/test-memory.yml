@@ -36,18 +36,23 @@ jobs:
             - name: Push Docker Image to Docker Hub
               run: docker push gildas21/memory
 
-    deploy-memory:
+     deploy-memory:
         runs-on: [self-hosted, linux, x64]
         needs: push-memory
         steps:
-            - name: Connect to Host and Deploy Container
-              uses: appleboy/ssh-action@v0.1.7
-              with:
-                  host: ${{ secrets.SSH_HOST }}
-                  username: ${{ secrets.SSH_USER }}
-                  password: ${{ secrets.SSH_USER }}
-                  script: |
-                      docker pull gildas21/memory
-                      docker stop memory || true
-                      docker rm memory || true
-                      docker run -d --name memory -p 80:80 gildas21/memory
+            - name: Add SSH key
+              run: |
+                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+                  chmod 600 private_key
+
+            - name: Connect via SSH and Deploy Container
+              env:
+                  HOST: ${{ secrets.SSH_HOST }}
+                  USER: ${{ secrets.SSH_USER }}
+              run: |
+                  #ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
+                  docker pull gildas21/memory
+                  docker stop memory || true
+                  docker rm memory || true
+                  docker run -d --name memory -p 80:80 gildas21/memory
+                  #EOF
