@@ -1,0 +1,47 @@
+name: test-memory
+on:
+    push:
+        branches: [develop]
+
+jobs:
+    test-memory:
+        runs-on: [self-hosted, linux, x64]
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: file
+              run: find . -name "*.jpg" -print0 | xargs -0 -n1 file
+
+    build-memory:
+        runs-on: [self-hosted, linux, x64]
+        needs: test-memory
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Build and Run Docker Image
+              run: |
+                  #!/bin/bash
+                  docker image rm gildas21/memory || true
+                  docker build -t gildas21/memory -f Dockerfile .
+
+    push-memory:
+        runs-on: [self-hosted, linux, x64]
+        needs: build-memory
+        steps:
+            - name: Login to Docker Hub
+              run: docker login -u '${{ secrets.DOCKER_USERNAME }}' -p '${{ secrets.DOCKER_PASSWORD }}'
+
+            - name: Push Docker Image to Docker Hub
+              run: docker push gildas21/memory
+
+    deploy-memory:
+        runs-on: [self-hosted, linux, x64]
+        needs: push-memory
+        steps:
+            - name: Connect via SSH and Deploy Container
+              run: |
+                  docker-compose pull  # Télécharger la dernière image
+                  docker-compose down || true  # Arrêter et supprimer les conteneurs existants
+                  docker-compose up -d  # Lancer les nouveaux conteneurs
