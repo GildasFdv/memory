@@ -50,9 +50,7 @@ jobs:
                   HOST: ${{ secrets.SSH_HOST }}
                   USER: ${{ secrets.SSH_USER }}
               run: |
-                  #ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
                   docker pull gildas21/memory
                   docker stop memory || true
                   docker rm memory || true
                   docker run -d --name memory -p 80:80 gildas21/memory
-                  #EOF
