@@ -42,7 +42,6 @@ jobs:
         steps:
             - name: Connect via SSH and Deploy Container
               run: |
-                  docker pull gildas21/memory
-                  docker stop memory || true
-                  docker rm memory || true
-                  docker run -d --name memory -p 8080:80 gildas21/memory
+                  docker-compose pull  # Télécharger la dernière image
+                  docker-compose down || true  # Arrêter et supprimer les conteneurs existants
+                  docker-compose up -d  # Lancer les nouveaux conteneurs

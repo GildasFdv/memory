@@ -1,0 +1,7 @@
+version: ''  # Version de Docker Compose
+
+services:
+  memory:
+    image: gildas21/memory  # Nom de l'image à utiliser
+    ports:
+      - "8080:80"  # Redirection du port 80 du conteneur vers le port 8080 de l'hôte
