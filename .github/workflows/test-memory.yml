@@ -45,4 +45,4 @@ jobs:
                   docker pull gildas21/memory
                   docker stop memory || true
                   docker rm memory || true
-                  docker run -d --name memory -p 80:80 gildas21/memory
+                  docker run -d --name memory -p 8080:80 gildas21/memory
