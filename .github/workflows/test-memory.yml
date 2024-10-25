@@ -10,6 +10,21 @@ jobs:
             - name: Checkout repo
               uses: actions/checkout@v3
 
-            - name: lint
+            - name: file
               run: find . -name "*.jpg" -print0 | xargs -0 -n1 file
 
+    build-memory:
+        runs-on: [self-hosted, linux, x64]
+        needs: test-memory
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Build and Run Docker Image
+              run: |
+                  #!/bin/bash
+                  docker stop memory || true
+                  docker rm memory || true
+                  docker image rm gildas21/memory || true
+                  docker build -t gildas21/memory -f Dockerfile .
+                  docker run -d --name memory -p 8080:80 gildas21/memory
