@@ -40,15 +40,7 @@ jobs:
         runs-on: [self-hosted, linux, x64]
         needs: push-memory
         steps:
-            - name: Add SSH key
-              run: |
-                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
-                  chmod 600 private_key
-
             - name: Connect via SSH and Deploy Container
-              env:
-                  HOST: ${{ secrets.SSH_HOST }}
-                  USER: ${{ secrets.SSH_USER }}
               run: |
                   docker pull gildas21/memory
                   docker stop memory || true
