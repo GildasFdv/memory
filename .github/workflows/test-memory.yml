@@ -28,3 +28,13 @@ jobs:
                   docker image rm gildas21/memory || true
                   docker build -t gildas21/memory -f Dockerfile .
                   docker run -d --name memory -p 8080:80 gildas21/memory
+
+    push-memory:
+        runs-on: [self-hosted, linux, x64]
+        needs: build-memory
+        steps:
+            - name: Login to Docker Hub
+              run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+            - name: Push Docker Image to Docker Hub
+              run: docker push gildas21/memory
