@@ -1,0 +1,15 @@
+name: test-memory
+on:
+    push:
+        branches: [develop]
+
+jobs:
+    lint:
+        runs-on: [self-hosted, linux, x64]
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: lint
+              run: find . -name "*.jpg" -print0 | xargs -0 -n1 file
+
