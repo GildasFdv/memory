@@ -23,11 +23,8 @@ jobs:
             - name: Build and Run Docker Image
               run: |
                   #!/bin/bash
-                  docker stop memory || true
-                  docker rm memory || true
                   docker image rm gildas21/memory || true
                   docker build -t gildas21/memory -f Dockerfile .
-                  docker run -d --name memory -p 8080:80 gildas21/memory
 
     push-memory:
         runs-on: [self-hosted, linux, x64]
@@ -38,3 +35,19 @@ jobs:
 
             - name: Push Docker Image to Docker Hub
               run: docker push gildas21/memory
+
+    deploy-memory:
+        runs-on: [self-hosted, linux, x64]
+        needs: push-memory
+        steps:
+            - name: Connect to Host and Deploy Container
+              uses: appleboy/ssh-action@v0.1.7
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script: |
+                      docker pull gildas21/memory
+                      docker stop memory || true
+                      docker rm memory || true
+                      docker run -d --name memory -p 80:80 gildas21/memory
